@@ -29,6 +29,7 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
+    """decorator registers a new command with the flask script"""
 @app.cli.command('initdb')
 def initdb_command():
     """Initializes the database."""
@@ -49,3 +50,10 @@ def close_db(error):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
+@app.route('/')
+def show_entries():
+    db = get_db()
+    cur = db.execute('select title, text from entries order by id desc')
+    entries = cur.fetchall()
+    return render_template('show_entries.html', entries=entries)
